@@ -199,6 +199,16 @@ Birden çok kullanıcıyı tek seferde eklemek için JSON dosyasıyla toplu yük
 npm run db:whitelist-batch -- --file users.json
 ```
 
+Yönetici, WhatsApp üzerinden doğrudan kullanıcı ekleyebilir (varsayılan olarak
+kapalı; açmak için hem `WHATSAPP_ADMIN_COMMANDS_ENABLED=true` hem de uygulama
+rolüne `APP_ROLE_ALLOW_WHITELIST_WRITE=true` ile yazma yetkisi gerekir). Yalnızca
+`admin.whitelist` yetkisine sahip kullanıcı çalıştırabilir; komut diğerlerine
+görünmez:
+
+```
+whitelist +905551112233 name="Ad Soyad" role=employee dept=Sales locale=tr perms=company.sales
+```
+
 Kullanıcılar WhatsApp üzerinden "erişim istiyorum" yazarak erişim, "verilerimi
 sil" yazarak silme talebi oluşturabilir. Bu talepler yalnızca denetim kaydına
 yazılır (çalışan servise whitelist yazma yetkisi verilmez); operatör görüntüler:

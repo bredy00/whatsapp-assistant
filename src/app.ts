@@ -4,6 +4,7 @@ import type { Logger } from "pino";
 import { AuthorizationService } from "./auth/authorization.service.js";
 import { FallbackAssistantResponder } from "./assistant/fallback-responder.js";
 import { BotCommandRouter } from "./assistant/bot-command-router.js";
+import { AdminWhitelistService } from "./auth/admin-whitelist.service.js";
 import type { AssistantResponder } from "./assistant/types.js";
 import { NoopEventNotifier, SignedHttpEventNotifier, type EventNotifier } from "./integrations/event-notifier.js";
 import { PermissionRepository } from "./auth/permission.repository.js";
@@ -136,13 +137,28 @@ export async function buildApp(dependencies: AppDependencies) {
     responder = new FallbackAssistantResponder(llmAssistant, router, dependencies.logger);
   }
 
+  // Direct-write WhatsApp whitelist command — off unless explicitly enabled and
+  // encryption is configured. Guarded further at runtime by the admin.whitelist
+  // permission, and requires the app DB role to have been provisioned with the
+  // opt-in users/permissions write grants.
+  const adminWhitelist =
+    dependencies.config.whatsapp.adminCommandsEnabled && encryption
+      ? new AdminWhitelistService({
+          pool: dependencies.appPool,
+          crypto: { encryption, identifiers, auditIntegrity },
+          authorization,
+          defaultCountry: dependencies.config.defaultPhoneCountry
+        })
+      : undefined;
+
   // Self-service bot commands (privacy notice, right-to-erasure, access
-  // request) are handled ahead of the report/LLM responder; anything else
-  // falls through unchanged.
+  // request, and — when enabled — the admin whitelist command) are handled
+  // ahead of the report/LLM responder; anything else falls through unchanged.
   responder = new BotCommandRouter(responder, {
     audit,
     logger: dependencies.logger,
-    defaultLocale: dependencies.config.assistantLocale
+    defaultLocale: dependencies.config.assistantLocale,
+    ...(adminWhitelist ? { adminWhitelist } : {})
   });
 
   // Optional signed outbound notifier for operational events. Disabled (noop)

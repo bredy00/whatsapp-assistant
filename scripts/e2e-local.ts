@@ -147,7 +147,8 @@ await registerWhatsAppRoutes(app, {
     graphApiVersion: "v25.0",
     appSecret: APP_SECRET,
     requireSignature: true,
-    debugLogging: false
+    debugLogging: false,
+    adminCommandsEnabled: false
   },
   processor,
   logger: createLogger("silent")

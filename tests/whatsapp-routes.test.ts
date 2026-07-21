@@ -28,7 +28,8 @@ async function appWithProcessor(
       graphApiVersion: "v25.0",
       appSecret: "meta-app-secret-with-32-characters",
       requireSignature: true,
-      debugLogging: false
+      debugLogging: false,
+      adminCommandsEnabled: false
     },
     processor: { enqueue, recordStatus } as unknown as MessageProcessor,
     logger: { info: vi.fn() } as unknown as Logger

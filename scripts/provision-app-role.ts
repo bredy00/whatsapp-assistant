@@ -68,6 +68,15 @@ try {
       roleName
     )
   );
+  // Opt-in: the runtime role stays SELECT-only on users/permissions unless the
+  // WhatsApp admin whitelist command is in use. Enabling this widens the
+  // least-privilege boundary (a compromised service could then create users),
+  // so it is deliberately gated behind an explicit environment flag.
+  if (process.env.APP_ROLE_ALLOW_WHITELIST_WRITE === "true") {
+    await client.query(format("GRANT INSERT, UPDATE ON users TO %I", roleName));
+    await client.query(format("GRANT INSERT, DELETE ON permissions TO %I", roleName));
+    process.stdout.write("Granted users/permissions write access for the WhatsApp admin whitelist command.\n");
+  }
   await client.query(format("GRANT SELECT, INSERT, UPDATE ON messages TO %I", roleName));
   await client.query(format("GRANT INSERT ON audit_events TO %I", roleName));
   await client.query(format("GRANT SELECT, UPDATE ON audit_chain_state TO %I", roleName));
