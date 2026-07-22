@@ -112,15 +112,15 @@ describe("admin whitelist command", () => {
     expect(next.calls).toBe(0);
   });
 
-  it("stays invisible to non-admins (falls through, no provisioning)", async () => {
+  it("stays invisible and inert for non-admins (falls through, no provisioning, no audit)", async () => {
     const service = new SpyAdminWhitelist(false);
     const { next, audit, router } = buildWithAdmin(service);
     const response = await router.handle(user, "whitelist +905551112233 name=x", context);
     expect(service.calls).toHaveLength(0);
     expect(next.calls).toBe(1);
     expect(response.text).toBe("downstream");
-    // The denied attempt is still recorded for security visibility.
-    expect(audit.events.some((event) => event.eventType === "identity.whitelist_denied")).toBe(true);
+    // Completely inert: nothing recorded, indistinguishable from ordinary text.
+    expect(audit.events).toHaveLength(0);
   });
 
   it("returns usage when an admin omits the phone", async () => {

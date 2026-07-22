@@ -193,33 +193,28 @@ standalone and point a locally running service at it.
 
 ## 8b. Direct-write whitelist command over WhatsApp (optional, off by default)
 
-Lets an admin onboard users straight from chat instead of the CLI. It crosses
-the normal least-privilege boundary (the runtime service is otherwise SELECT-only
-on `users`), so it is gated three ways and enabling it is a deliberate decision:
+Lets an admin onboard users from chat instead of the CLI. Off by default; enabling
+it is a deliberate act because it lets the runtime write the whitelist (normally
+it is SELECT-only). **Turkish operator guide: `docs/OPERATOR.tr.md`.**
 
-1. **DB grant (opt-in):** re-run the app-role provisioner with the flag set —
-   `APP_ROLE_ALLOW_WHITELIST_WRITE=true npm run db:provision-app-role -- --confirm-dedicated-database`.
-   This adds `INSERT, UPDATE ON users` and `INSERT, DELETE ON permissions` to the
-   runtime role. Without it, the command cannot write and the service stays
-   SELECT-only.
-2. **Runtime flag:** set `WHATSAPP_ADMIN_COMMANDS_ENABLED=true`.
-3. **Permission:** the actor must hold `admin.whitelist` (action `write`). Grant
-   it with a direct SQL insert into `permissions` for a trusted admin user, or
-   via your provisioning process. Non-admins get no response — the command is
-   invisible to them (their attempt is audited as `identity.whitelist_denied`).
-
-Usage (English or Turkish trigger; `whitelist` / `yetkilendir`):
+**Usage** (trigger `whitelist` or `yetkilendir`; `role` defaults to `employee`,
+the rest optional):
 
 ```
 whitelist +905551112233 name="Full Name" role=employee dept=Sales locale=tr perms=company.sales,company.tasks
 ```
 
-`role` defaults to `employee`; `dept`/`locale`/`perms` are optional. Each write
-runs in one transaction that records both the recipient's `identity.whitelist_update`
-and the actor's `identity.whitelist_admin_action` (no recipient PII in the latter).
-To revert to SELECT-only, re-provision the role without the flag and revoke the
-grants. Leave everything default to keep the runtime service unable to modify the
-whitelist at all.
+**Enable — all three are required:**
+
+1. **DB grant:** `APP_ROLE_ALLOW_WHITELIST_WRITE=true npm run db:provision-app-role -- --confirm-dedicated-database`
+2. **Runtime flag:** `WHATSAPP_ADMIN_COMMANDS_ENABLED=true`
+3. **Permission:** give the trusted admin `admin.whitelist` (action `write`) in `permissions`.
+
+**Behaviour:** non-admins get no response and nothing is recorded — the command
+is inert for them. Each successful write is one transaction that audits both the
+recipient (`identity.whitelist_update`) and the actor (`identity.whitelist_admin_action`,
+no recipient PII). **Disable:** drop either flag; re-provision without the grant
+to make the runtime SELECT-only again.
 
 ## 8a. Abuse lockout, replay protection, and integration events
 

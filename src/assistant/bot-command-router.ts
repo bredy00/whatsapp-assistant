@@ -55,9 +55,9 @@ export class BotCommandRouter implements AssistantResponder {
     const locale = user.locale ?? this.options.defaultLocale;
 
     if (this.options.adminWhitelist && isWhitelistCommand(incomingText)) {
-      const handled = await this.handleWhitelist(user, incomingText, locale, context);
+      const handled = await this.handleWhitelist(user, incomingText, locale);
       // null means "not an admin" (or a race) — fall through so the command
-      // stays invisible to anyone who cannot use it.
+      // stays invisible and inert for anyone who cannot use it.
       if (handled) return handled;
     }
 
@@ -81,20 +81,16 @@ export class BotCommandRouter implements AssistantResponder {
   }
 
   // Returns a response only when the actor is an admin; otherwise null so the
-  // caller falls through and the command reveals nothing to non-admins.
+  // caller falls through. For a non-admin the command is completely inert — it
+  // never runs, records nothing, and is indistinguishable from ordinary text.
   private async handleWhitelist(
     actor: AuthorizedUser,
     incomingText: string,
-    locale: AssistantLocale,
-    context: AssistantContext
+    locale: AssistantLocale
   ): Promise<AssistantResponse | null> {
     const service = this.options.adminWhitelist;
     if (!service) return null;
-    if (!(await service.isAdmin(actor))) {
-      // Bounded by the upstream per-user rate limit; useful security signal.
-      await this.record(actor.id, "identity.whitelist_denied", context.messageId).catch(() => undefined);
-      return null;
-    }
+    if (!(await service.isAdmin(actor))) return null;
     const input = parseWhitelistCommand(incomingText);
     if (!input) return this.reply(systemMessage("whitelistUsage", locale));
     try {

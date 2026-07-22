@@ -361,7 +361,8 @@ npm audit --omit=dev --audit-level=moderate
 
 Teslimat hataları (131030, süresi dolmuş token vb.), Render deployment
 checklist'i ve Meta konsol adımları için [docs/RUNBOOK.md](docs/RUNBOOK.md)
-dosyasına bakın. Hızlı araçlar:
+dosyasına bakın. Türkçe operatör kılavuzu için
+[docs/OPERATOR.tr.md](docs/OPERATOR.tr.md). Hızlı araçlar:
 
 ```bash
 npm run setup:env                                  # güçlü rastgele secret'larla .env üret
