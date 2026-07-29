@@ -97,6 +97,7 @@ const schema = z
       .default("true")
       .transform((value) => value === "true"),
     WHATSAPP_DEBUG_LOGGING: booleanFromString,
+    WHATSAPP_ADMIN_COMMANDS_ENABLED: booleanFromString,
     LLM_ENABLED: booleanFromString,
     LLM_PROVIDER: z.enum(["openai", "gemini"]).default("openai"),
     OPENAI_API_KEY: z.string().optional(),
@@ -490,6 +491,7 @@ export type AppConfig = {
     appSecret?: string;
     requireSignature: boolean;
     debugLogging: boolean;
+    adminCommandsEnabled: boolean;
   };
   llm: {
     enabled: boolean;
@@ -563,7 +565,8 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
       graphApiVersion: env.WHATSAPP_GRAPH_API_VERSION,
       ...(env.META_APP_SECRET ? { appSecret: env.META_APP_SECRET } : {}),
       requireSignature: env.REQUIRE_WHATSAPP_SIGNATURE,
-      debugLogging: env.WHATSAPP_DEBUG_LOGGING
+      debugLogging: env.WHATSAPP_DEBUG_LOGGING,
+      adminCommandsEnabled: env.WHATSAPP_ADMIN_COMMANDS_ENABLED
     },
     llm: {
       enabled: env.LLM_ENABLED,

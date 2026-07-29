@@ -36,7 +36,7 @@ function config(): AppConfig {
     abuseLockoutThresholdPerMinute: 10,
     webhookMessageMaxAgeSeconds: 0,
     integration: { timeoutMs: 4000 },
-    whatsapp: { enabled: false, graphApiVersion: "v25.0", requireSignature: true, debugLogging: false },
+    whatsapp: { enabled: false, graphApiVersion: "v25.0", requireSignature: true, debugLogging: false, adminCommandsEnabled: false },
     llm: {
       enabled: false,
       provider: "openai",

@@ -199,6 +199,16 @@ Birden çok kullanıcıyı tek seferde eklemek için JSON dosyasıyla toplu yük
 npm run db:whitelist-batch -- --file users.json
 ```
 
+Yönetici, WhatsApp üzerinden doğrudan kullanıcı ekleyebilir (varsayılan olarak
+kapalı; açmak için hem `WHATSAPP_ADMIN_COMMANDS_ENABLED=true` hem de uygulama
+rolüne `APP_ROLE_ALLOW_WHITELIST_WRITE=true` ile yazma yetkisi gerekir). Yalnızca
+`admin.whitelist` yetkisine sahip kullanıcı çalıştırabilir; komut diğerlerine
+görünmez:
+
+```
+whitelist +905551112233 name="Ad Soyad" role=employee dept=Sales locale=tr perms=company.sales
+```
+
 Kullanıcılar WhatsApp üzerinden "erişim istiyorum" yazarak erişim, "verilerimi
 sil" yazarak silme talebi oluşturabilir. Bu talepler yalnızca denetim kaydına
 yazılır (çalışan servise whitelist yazma yetkisi verilmez); operatör görüntüler:
@@ -351,7 +361,8 @@ npm audit --omit=dev --audit-level=moderate
 
 Teslimat hataları (131030, süresi dolmuş token vb.), Render deployment
 checklist'i ve Meta konsol adımları için [docs/RUNBOOK.md](docs/RUNBOOK.md)
-dosyasına bakın. Hızlı araçlar:
+dosyasına bakın. Türkçe operatör kılavuzu için
+[docs/OPERATOR.tr.md](docs/OPERATOR.tr.md). Hızlı araçlar:
 
 ```bash
 npm run setup:env                                  # güçlü rastgele secret'larla .env üret

@@ -6,7 +6,8 @@ export type SystemMessageKey =
   | "processingFailed"
   | "privacyInfo"
   | "erasureRequested"
-  | "accessRequested";
+  | "accessRequested"
+  | "whitelistUsage";
 
 // User-facing notices the pipeline sends on its own (no LLM involved).
 // ASSISTANT_LOCALE picks the language; report content itself is produced by
@@ -37,6 +38,10 @@ const SYSTEM_MESSAGES: Record<SystemMessageKey, Record<AssistantLocale, string>>
   accessRequested: {
     tr: "Erişim talebiniz alındı ve kaydedildi. Bir yönetici en kısa sürede değerlendirecektir.",
     en: "Your access request has been received and logged. An administrator will review it shortly."
+  },
+  whitelistUsage: {
+    tr: 'Kullanım: whitelist +905551112233 name="Ad Soyad" role=employee [dept=Sales] [locale=tr] [perms=company.sales]',
+    en: 'Usage: whitelist +905551112233 name="Full Name" role=employee [dept=Sales] [locale=tr] [perms=company.sales]'
   }
 };
 
